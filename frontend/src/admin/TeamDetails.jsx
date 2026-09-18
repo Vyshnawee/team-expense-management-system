@@ -10,28 +10,23 @@ const TeamDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // ✅ Add User States
   const [showModal, setShowModal] = useState(false);
   const [availableUsers, setAvailableUsers] = useState([]);
   const [selectedUserId, setSelectedUserId] = useState("");
 
-  // 🔹 Fetch team users
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         if (!team?.teamId) return;
 
         const res = await fetch(`${API_URL}/teams/${team.teamId}/users`);
-
-        if (!res.ok) {
-          throw new Error("Failed to fetch users");
-        }
+        if (!res.ok) throw new Error("Failed to fetch users");
 
         const data = await res.json();
-        setUsers(data);
+        setUsers(data || []);
       } catch (err) {
         console.error(err);
-        setError("Something went wrong while fetching users");
+        setError("Something went wrong while fetching team members.");
       } finally {
         setLoading(false);
       }
@@ -40,16 +35,15 @@ const TeamDetails = () => {
     fetchUsers();
   }, [team]);
 
-  // 🔹 Fetch available users (NOT in team)
   useEffect(() => {
     const fetchAvailableUsers = async () => {
       try {
-        const res = await fetch("${API_URL}/users/available-employees");
-
+        // Bug fix: template literal instead of plain string literal "${API_URL}/users/available-employees"
+        const res = await fetch(`${API_URL}/users/available-employees`);
         if (!res.ok) throw new Error("Failed to fetch employees");
 
         const data = await res.json();
-        setAvailableUsers(data);
+        setAvailableUsers(data || []);
       } catch (err) {
         console.error(err);
       }
@@ -60,33 +54,23 @@ const TeamDetails = () => {
     }
   }, [showModal]);
 
-  // 🔹 Add user to team
   const handleAddUser = async () => {
     if (!selectedUserId) return;
-
     const userId = parseInt(selectedUserId);
 
     try {
       const res = await fetch(
         `${API_URL}/teams/${team.teamId}/member/${userId}`,
-        {
-          method: "POST",
-        },
+        { method: "POST" }
       );
-
-      console.log("Response:", res.status);
 
       if (!res.ok) throw new Error("Failed to add user");
 
-      // ✅ FIX: fetch updated team users
       const updatedRes = await fetch(`${API_URL}/teams/${team.teamId}/users`);
-
       const updatedUsers = await updatedRes.json();
-      setUsers(updatedUsers);
+      setUsers(updatedUsers || []);
 
-      // optional: update dropdown
       setAvailableUsers((prev) => prev.filter((u) => u.userId !== userId));
-
       setShowModal(false);
       setSelectedUserId("");
     } catch (err) {
@@ -94,19 +78,14 @@ const TeamDetails = () => {
     }
   };
 
-  // 🔹 Remove user
   const handleRemove = async (userId) => {
     try {
       const res = await fetch(
         `${API_URL}/teams/${team.teamId}/users/${userId}/remove`,
-        {
-          method: "PUT",
-        },
+        { method: "PUT" }
       );
 
-      if (!res.ok) {
-        throw new Error("Failed to remove user");
-      }
+      if (!res.ok) throw new Error("Failed to remove user");
 
       setUsers((prev) => prev.filter((u) => u.userId !== userId));
     } catch (err) {
@@ -114,86 +93,97 @@ const TeamDetails = () => {
     }
   };
 
-  // ⚠️ If page refreshed and no state
   if (!team) {
     return (
-      <div className="p-6 text-red-500">
-        No team data found. Please go back and click View again.
+      <div className="p-8 font-sans">
+        <div className="panel p-6 text-red-600 text-sm">
+          No team selected. Please return to the Teams list and select View Details.
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="p-6">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">Team: {team.teamName}</h1>
-
+    <div className="p-8 font-sans">
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h1 className="page-title">Team: {team.teamName}</h1>
+          <p className="page-subtitle">Manage members assigned to this team</p>
+        </div>
         <button
           onClick={() => setShowModal(true)}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          className="btn-primary"
         >
-          + Add User
+          + Add Member
         </button>
       </div>
 
-      {/* Loading */}
-      {loading && <p>Loading team members...</p>}
+      {loading && <div className="p-4 text-sm text-gray-500">Loading team members...</div>}
+      {error && <div className="p-4 text-sm text-red-600 mb-4">{error}</div>}
 
-      {/* Error */}
-      {error && <p className="text-red-500">{error}</p>}
-
-      {/* Empty */}
-      {!loading && users.length === 0 && <p>No team members found</p>}
-
-      {/* Table */}
-      {!loading && users.length > 0 && (
-        <div className="overflow-x-auto">
-          <table className="min-w-full border border-gray-200 shadow-md rounded-lg">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="p-3 text-left">User ID</th>
-                <th className="p-3 text-left">Name</th>
-                <th className="p-3 text-left">Email</th>
-                <th className="p-3 text-left">Role</th>
-                <th className="p-3 text-left">Actions</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {users.map((user) => (
-                <tr key={user.userId} className="border-t hover:bg-gray-50">
-                  <td className="p-3">{user.userId}</td>
-                  <td className="p-3">{user.userName}</td>
-                  <td className="p-3">{user.email}</td>
-                  <td className="p-3">{user.role?.roleName}</td>
-                  <td className="p-3">
-                    <button
-                      onClick={() => handleRemove(user.userId)}
-                      className="bg-red-100 text-red-600 px-3 py-1 rounded hover:bg-red-200"
-                    >
-                      Remove
-                    </button>
-                  </td>
+      {!loading && (
+        <div className="panel overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>User ID</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {users.length === 0 ? (
+                  <tr>
+                    <td colSpan="5" className="py-12 text-center text-sm text-gray-400">
+                      No members assigned to this team
+                    </td>
+                  </tr>
+                ) : (
+                  users.map((user) => (
+                    <tr key={user.userId}>
+                      <td className="font-mono text-xs text-gray-500">{user.userId}</td>
+                      <td className="font-medium text-ledger">{user.userName}</td>
+                      <td>{user.email}</td>
+                      <td>
+                        <span className="pill-default">{user.role?.roleName || user.role}</span>
+                      </td>
+                      <td>
+                        <button
+                          onClick={() => handleRemove(user.userId)}
+                          className="text-xs text-red-600 hover:text-red-800 font-medium"
+                        >
+                          Remove
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
-      {/* ✅ Add User Modal */}
+      {/* Add Member Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg w-96">
-            <h2 className="text-lg font-bold mb-4">Add Employee to Team</h2>
+        <div className="fixed inset-0 bg-ledger/40 flex items-center justify-center z-50">
+          <div className="bg-white rounded p-6 w-96 shadow-lg border border-gray-100 font-sans">
+            <h2 className="font-display text-lg font-semibold text-ledger mb-4">
+              Add Member to {team.teamName}
+            </h2>
 
+            <label className="block text-xs font-medium text-gray-600 mb-1.5 uppercase tracking-wide">
+              Select Employee
+            </label>
             <select
-              className="w-full border p-2 mb-4"
+              className="field-input mb-5"
               value={selectedUserId}
               onChange={(e) => setSelectedUserId(e.target.value)}
             >
-              <option value="">Select Employee</option>
+              <option value="">Choose an available employee</option>
               {availableUsers.map((user) => (
                 <option key={user.userId} value={user.userId}>
                   {user.userName} ({user.email})
@@ -204,21 +194,16 @@ const TeamDetails = () => {
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setShowModal(false)}
-                className="px-3 py-1 bg-gray-300 rounded"
+                className="btn-secondary text-xs"
               >
                 Cancel
               </button>
-
               <button
                 onClick={handleAddUser}
                 disabled={!selectedUserId}
-                className={`px-3 py-1 rounded text-white ${
-                  selectedUserId
-                    ? "bg-blue-500 hover:bg-blue-600"
-                    : "bg-gray-400 cursor-not-allowed"
-                }`}
+                className="btn-primary text-xs"
               >
-                Add
+                Add Member
               </button>
             </div>
           </div>

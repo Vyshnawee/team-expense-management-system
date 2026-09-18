@@ -1,3 +1,88 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-color: #F5F0E8;
+    color: #1A2332;
+  }
+}
+
+@layer components {
+  /* Status pill base */
+  .pill {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium tracking-wide;
+  }
+  .pill-approved {
+    @apply pill bg-cleared-50 text-cleared;
+  }
+  .pill-paid {
+    @apply pill bg-cleared-100 text-cleared;
+  }
+  .pill-pending {
+    @apply pill bg-amber-50 text-amber;
+  }
+  .pill-rejected {
+    @apply pill bg-red-50 text-red-700;
+  }
+  .pill-default {
+    @apply pill bg-gray-100 text-gray-600;
+  }
+
+  /* Form inputs */
+  .field-input {
+    @apply w-full border border-gray-200 rounded px-3 py-2.5 text-sm text-ledger placeholder:text-gray-400 focus:outline-none focus:border-ledger transition-colors bg-white;
+  }
+
+  /* Primary button */
+  .btn-primary {
+    @apply bg-cleared text-white px-4 py-2 text-sm font-medium rounded hover:bg-cleared-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  /* Secondary button */
+  .btn-secondary {
+    @apply border border-gray-300 text-gray-600 px-4 py-2 text-sm font-medium rounded hover:border-ledger hover:text-ledger transition-colors;
+  }
+
+  /* Ledger (dark) button — login, sign in */
+  .btn-ledger {
+    @apply bg-ledger text-white px-4 py-2 text-sm font-medium rounded hover:bg-ledger-light transition-colors disabled:opacity-50;
+  }
+
+  /* Table */
+  .data-table {
+    @apply w-full text-sm;
+  }
+  .data-table thead tr {
+    @apply border-b border-gray-200;
+  }
+  .data-table thead th {
+    @apply text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wide;
+  }
+  .data-table tbody tr {
+    @apply border-b border-gray-50 hover:bg-cream transition-colors;
+  }
+  .data-table tbody td {
+    @apply py-3 px-4 text-gray-700;
+  }
+
+  /* Page header */
+  .page-title {
+    @apply font-display text-2xl font-semibold text-ledger tracking-tight;
+  }
+  .page-subtitle {
+    @apply text-sm text-gray-500 mt-0.5;
+  }
+
+  /* Flat panel (no shadow by default) */
+  .panel {
+    @apply bg-white border border-gray-100 rounded;
+  }
+}

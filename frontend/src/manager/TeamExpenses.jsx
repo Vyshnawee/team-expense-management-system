@@ -1,47 +1,49 @@
 import { useEffect, useState } from "react";
-import { Check, X } from "lucide-react";
 import { API_URL } from "../config";
+
+const CheckIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+    <polyline points="2,7 6,11 12,3"/>
+  </svg>
+);
+
+const XIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+    <line x1="2" y1="2" x2="12" y2="12"/><line x1="12" y1="2" x2="2" y2="12"/>
+  </svg>
+);
 
 const TeamExpenses = () => {
   const [expenses, setExpenses] = useState([]);
+  const [loading, setLoading] = useState(true);
   const teamId = localStorage.getItem("teamId");
 
-  const getStatusStyle = (status) => {
-    switch (status?.toLowerCase()) {
-      case "approved":
-        return "bg-green-100 text-green-700";
-      case "rejected":
-        return "bg-red-100 text-red-700";
-      case "pending":
-        return "bg-yellow-100 text-yellow-700";
-      case "paid":
-        return "bg-blue-100 text-blue-700";
-      default:
-        return "bg-gray-100 text-gray-700";
-    }
+  const getStatusPill = (status) => {
+    const s = status?.toLowerCase();
+    if (s === "approved") return "pill-approved";
+    if (s === "paid") return "pill-paid";
+    if (s === "pending") return "pill-pending";
+    if (s === "rejected") return "pill-rejected";
+    return "pill-default";
   };
 
   const updateStatus = async (expenseId, status) => {
     try {
-      const userId = localStorage.getItem("userId"); // ✅ get manager id
+      const userId = localStorage.getItem("userId");
 
       if (status === "APPROVED") {
         await fetch(
           `${API_URL}/approvals/approve/${expenseId}?userId=${userId}`,
-          {
-            method: "POST",
-          },
+          { method: "POST" }
         );
       } else {
         await fetch(
           `${API_URL}/approvals/reject/${expenseId}?userId=${userId}`,
-          {
-            method: "POST",
-          },
+          { method: "POST" }
         );
       }
 
-      fetchExpenses(); // refresh
+      fetchExpenses();
     } catch (err) {
       console.error(err);
     }
@@ -51,103 +53,105 @@ const TeamExpenses = () => {
     try {
       const res = await fetch(`${API_URL}/expenses/team/${teamId}`);
       const data = await res.json();
-      setExpenses(data);
+      setExpenses(data || []);
+      setLoading(false);
     } catch (err) {
       console.error(err);
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     if (teamId) fetchExpenses();
-  }, []);
+    else setLoading(false);
+  }, [teamId]);
+
+  if (loading) return <div className="p-8 text-sm text-gray-500">Loading...</div>;
 
   return (
-    <>
-      <h1 className="text-2xl font-bold mb-6">Team Expenses</h1>
+    <div className="p-8 font-sans">
+      <div className="mb-6">
+        <h1 className="page-title">Team Expenses</h1>
+        <p className="page-subtitle">Review and manage expense claims from your team</p>
+      </div>
 
-      <div className="bg-white shadow rounded p-4 overflow-x-auto">
-        <table className="w-full text-left">
-          <thead>
-            <tr className="border-b bg-gray-100">
-              <th className="p-2">Title</th>
-              <th className="p-2">Amount</th>
-              <th className="p-2">Employee</th>
-              <th className="p-2">Category</th>
-              <th className="p-2">Status</th>
-              <th className="p-2">Date</th>
-              <th className="p-2">Receipt</th>
-              <th className="p-2">Actions</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {expenses.length === 0 ? (
+      <div className="panel overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="data-table">
+            <thead>
               <tr>
-                <td colSpan="8" className="text-center p-4 text-gray-500">
-                  No expenses found
-                </td>
+                <th>Title</th>
+                <th>Amount</th>
+                <th>Employee</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Receipt</th>
+                <th>Actions</th>
               </tr>
-            ) : (
-              expenses.map((exp) => (
-                <tr key={exp.expenseId} className="border-b hover:bg-gray-50">
-                  <td className="p-2">{exp.title}</td>
-                  <td className="p-2 font-medium">₹{exp.amount}</td>
-                  <td className="p-2">{exp.user?.userName}</td>
-                  <td className="p-2">{exp.category?.name}</td>
-
-                  <td className="p-2">
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusStyle(
-                        exp.status,
-                      )}`}
-                    >
-                      {exp.status}
-                    </span>
-                  </td>
-
-                  <td className="p-2">
-                    {exp.createdAt
-                      ? new Date(exp.createdAt).toLocaleDateString()
-                      : "N/A"}
-                  </td>
-
-                  <td className="p-2">
-                    {exp.receiptUrl ? (
-                      <a
-                        href={`${API_URL}/${exp.receiptUrl}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 underline"
-                      >
-                        View
-                      </a>
-                    ) : (
-                      <span className="text-gray-400">No Receipt</span>
-                    )}
-                  </td>
-
-                  <td className="p-2 flex gap-2">
-                    <button
-                      onClick={() => updateStatus(exp.expenseId, "APPROVED")}
-                      className="bg-green-500 text-white px-3 py-1 rounded"
-                    >
-                      <Check size={16} />
-                    </button>
-
-                    <button
-                      onClick={() => updateStatus(exp.expenseId, "REJECTED")}
-                      className="bg-red-500 text-white px-3 py-1 rounded"
-                    >
-                      <X size={16} />
-                    </button>
+            </thead>
+            <tbody>
+              {expenses.length === 0 ? (
+                <tr>
+                  <td colSpan="8" className="py-12 text-center text-sm text-gray-400">
+                    No team expenses found
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : (
+                expenses.map((exp) => (
+                  <tr key={exp.expenseId}>
+                    <td className="font-medium text-ledger">{exp.title}</td>
+                    <td className="font-semibold text-ledger">₹{exp.amount}</td>
+                    <td>{exp.user?.userName || "—"}</td>
+                    <td>{exp.category?.name || "—"}</td>
+                    <td>
+                      <span className={getStatusPill(exp.status)}>{exp.status}</span>
+                    </td>
+                    <td className="text-gray-500">
+                      {exp.createdAt
+                        ? new Date(exp.createdAt).toLocaleDateString("en-IN")
+                        : "—"}
+                    </td>
+                    <td>
+                      {exp.receiptUrl ? (
+                        <a
+                          href={`${API_URL}${exp.receiptUrl}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-cleared hover:underline font-medium"
+                        >
+                          View receipt
+                        </a>
+                      ) : (
+                        <span className="text-xs text-gray-400">None</span>
+                      )}
+                    </td>
+                    <td>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => updateStatus(exp.expenseId, "APPROVED")}
+                          className="bg-cleared-50 text-cleared hover:bg-cleared-100 px-2.5 py-1 text-xs rounded font-medium transition-colors inline-flex items-center gap-1"
+                          title="Approve expense"
+                        >
+                          <CheckIcon /> Approve
+                        </button>
+                        <button
+                          onClick={() => updateStatus(exp.expenseId, "REJECTED")}
+                          className="bg-red-50 text-red-600 hover:bg-red-100 px-2.5 py-1 text-xs rounded font-medium transition-colors inline-flex items-center gap-1"
+                          title="Reject expense"
+                        >
+                          <XIcon /> Reject
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
-    </>
+    </div>
   );
 };
 

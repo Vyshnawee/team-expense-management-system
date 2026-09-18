@@ -8,31 +8,29 @@ const TeamForm = () => {
     teamName: "",
     managerName: "",
   });
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
 
   const editTeam = location.state?.team;
 
-  // ✅ fetch users
   useEffect(() => {
     fetch(`${API_URL}/users`)
       .then((res) => res.json())
-      .then((data) => setUsers(data))
+      .then((data) => setUsers(data || []))
       .catch((err) => console.error(err));
   }, []);
 
-  // ✅ prefill form (EDIT)
   useEffect(() => {
     if (editTeam) {
       setForm({
         teamName: editTeam.teamName || "",
-        managerName: editTeam.manager?.userName || "", // ✅ FIXED
+        managerName: editTeam.manager?.userName || "",
       });
     }
   }, [editTeam]);
 
-  // ✅ handle input
   const handleChange = (e) => {
     setForm({
       ...form,
@@ -40,17 +38,18 @@ const TeamForm = () => {
     });
   };
 
-  // ✅ submit
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
       const managerUser = users.find(
-        (u) => u.userName.toLowerCase() === form.managerName.toLowerCase(),
+        (u) => u.userName.toLowerCase() === form.managerName.toLowerCase()
       );
 
       if (!managerUser) {
-        alert("Manager not found");
+        alert("Manager user not found. Please verify the exact username.");
+        setLoading(false);
         return;
       }
 
@@ -60,62 +59,86 @@ const TeamForm = () => {
         managerId: managerUser.userId,
       };
 
-      console.log("FINAL PAYLOAD:", payload);
-
       const res = await fetch(`${API_URL}/teams`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
-      const data = await res.json();
-      console.log("Response:", data);
+      if (!res.ok) throw new Error("Failed to create team");
 
-      if (!res.ok) {
-        throw new Error("Failed to create team");
-      }
-
-      alert("Team added!");
       navigate("/admin/teams");
     } catch (err) {
       console.error(err);
       alert("Something went wrong");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-6 shadow-lg rounded-lg bg-white">
-      <h2 className="text-xl font-bold mb-4">
-        {editTeam ? "Edit Team" : "Add Team"}
-      </h2>
+    <div className="max-w-lg mx-auto py-8 px-6 font-sans">
+      <div className="mb-6">
+        <h1 className="page-title">{editTeam ? "Edit Team" : "Add Team"}</h1>
+        <p className="page-subtitle">Configure team details and assign a department manager</p>
+      </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Team Name */}
-        <input
-          type="text"
-          name="teamName"
-          placeholder="Team Name"
-          value={form.teamName}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        />
+      <div className="panel p-6">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1.5 uppercase tracking-wide">
+              Team Name
+            </label>
+            <input
+              type="text"
+              name="teamName"
+              placeholder="e.g., Engineering, Marketing"
+              value={form.teamName}
+              onChange={handleChange}
+              className="field-input"
+              required
+            />
+          </div>
 
-        {/* Manager Name */}
-        <input
-          type="text"
-          name="managerName"
-          placeholder="Manager Name"
-          value={form.managerName}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        />
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1.5 uppercase tracking-wide">
+              Manager Username
+            </label>
+            <input
+              type="text"
+              name="managerName"
+              placeholder="Exact username of assigned manager"
+              value={form.managerName}
+              onChange={handleChange}
+              className="field-input"
+              required
+            />
+          </div>
 
-        <button className="bg-blue-500 text-white px-4 py-2 rounded w-full">
-          {editTeam ? "Update Team" : "Add Team"}
-        </button>
-      </form>
+          <div className="pt-2 flex gap-3">
+            <button
+              type="button"
+              onClick={() => navigate("/admin/teams")}
+              className="btn-secondary flex-1"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn-primary flex-1 py-2.5"
+            >
+              {loading
+                ? editTeam
+                  ? "Updating..."
+                  : "Adding..."
+                : editTeam
+                ? "Update Team"
+                : "Create Team"}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };

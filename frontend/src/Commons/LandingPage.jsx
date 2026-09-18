@@ -1,211 +1,164 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import dashboardImg from "../assets/dashboard.png";
 
 const LandingPage = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-[#0f172a] text-white">
-      {/* 🔷 Navbar */}
-      <nav className="flex justify-between items-center px-10 py-5 border-b border-gray-800">
-        <h1 className="text-2xl font-bold text-emerald-400">TEMS</h1>
-
-        <button
-          onClick={() => navigate("/login")}
-          className="bg-gradient-to-r from-emerald-400 to-green-500 hover:from-emerald-500 hover:to-green-600 px-5 py-2 rounded-lg font-medium shadow-md transition"
-        >
-          Login
-        </button>
+    <div className="min-h-screen bg-cream font-sans">
+      {/* Navbar */}
+      <nav className="flex justify-between items-center px-8 py-4 bg-white border-b border-gray-100 sticky top-0 z-10">
+        <span className="font-display text-xl font-semibold text-ledger">TEMS</span>
+        <div className="flex items-center gap-4">
+          <Link to="/login" className="text-sm text-gray-500 hover:text-ledger transition-colors">Sign in</Link>
+          <button
+            onClick={() => navigate("/signup")}
+            className="btn-ledger"
+          >
+            Get started
+          </button>
+        </div>
       </nav>
 
-      {/* 🔥 Hero */}
-      <section className="text-center px-6 py-24">
-        <h1 className="text-5xl font-bold leading-tight max-w-3xl mx-auto">
-          Stop Managing Expenses in Chaos.
-          <br />
-          <span className="text-emerald-400">Start Managing with Clarity.</span>
-        </h1>
+      {/* Hero */}
+      <section className="px-8 py-20 max-w-5xl mx-auto">
+        <div className="max-w-2xl">
+          <h1 className="font-display text-5xl font-semibold text-ledger leading-tight">
+            Expense management<br />
+            your team will<br />
+            <span className="text-cleared">actually use.</span>
+          </h1>
+          <p className="text-gray-500 mt-6 text-lg leading-relaxed max-w-xl">
+            TEMS gives employees a straightforward way to submit expenses, managers the tools to review them instantly, and finance teams a clear audit trail — all in one place.
+          </p>
+          <div className="flex items-center gap-4 mt-8">
+            <button onClick={() => navigate("/signup")} className="btn-ledger px-6 py-2.5 text-base">
+              Start free
+            </button>
+            <Link to="/login" className="text-sm text-gray-500 hover:text-ledger transition-colors">
+              Already have an account? Sign in
+            </Link>
+          </div>
+        </div>
+      </section>
 
-        <p className="text-gray-400 mt-6 max-w-xl mx-auto text-lg">
-          TEMS helps teams track, approve, and settle expenses in one
-          streamlined platform — no spreadsheets, no confusion.
+      {/* Stats row */}
+      <section className="px-8 py-8 border-y border-gray-100 bg-white">
+        <div className="max-w-5xl mx-auto flex gap-12 items-center">
+          <div>
+            <p className="font-display text-3xl font-semibold text-ledger">100+</p>
+            <p className="text-sm text-gray-500 mt-1">Expenses tracked</p>
+          </div>
+          <div className="w-px h-10 bg-gray-200" />
+          <div>
+            <p className="font-display text-3xl font-semibold text-ledger">50+</p>
+            <p className="text-sm text-gray-500 mt-1">Active users</p>
+          </div>
+          <div className="w-px h-10 bg-gray-200" />
+          <div>
+            <p className="font-display text-3xl font-semibold text-ledger">3 roles</p>
+            <p className="text-sm text-gray-500 mt-1">Employee, Manager, Admin</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Dashboard preview */}
+      <section className="px-8 py-20 max-w-5xl mx-auto">
+        <h2 className="font-display text-3xl font-semibold text-ledger mb-3">
+          One view for the whole picture.
+        </h2>
+        <p className="text-gray-500 max-w-xl mb-10">
+          Dashboards update in real time. Submit, approve, and pay without switching tools or waiting for email chains.
         </p>
+        <div className="border border-gray-200 rounded overflow-hidden bg-white">
+          <div className="bg-ledger px-4 py-2.5 flex items-center gap-1.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-white/20" />
+            <span className="w-2.5 h-2.5 rounded-full bg-white/20" />
+            <span className="w-2.5 h-2.5 rounded-full bg-white/20" />
+            <span className="ml-3 text-white/50 text-xs font-mono">tems.app/dashboard</span>
+          </div>
+          <img alt="TEMS dashboard preview" src={dashboardImg} className="w-full h-auto" />
+        </div>
+      </section>
 
+      {/* How it works — numbered, not 3 identical cards */}
+      <section className="px-8 py-20 bg-white border-y border-gray-100">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="font-display text-3xl font-semibold text-ledger mb-12">How it works</h2>
+          <div className="space-y-10">
+            <div className="flex gap-8 items-start">
+              <span className="font-display text-5xl font-semibold text-gray-100 leading-none select-none">01</span>
+              <div>
+                <h3 className="font-semibold text-ledger text-lg mb-1">Employee submits</h3>
+                <p className="text-gray-500 max-w-md">Fill out the expense form with title, amount, category, and an optional receipt. Submitted in under a minute.</p>
+              </div>
+            </div>
+            <div className="w-full h-px bg-gray-100" />
+            <div className="flex gap-8 items-start">
+              <span className="font-display text-5xl font-semibold text-gray-100 leading-none select-none">02</span>
+              <div>
+                <h3 className="font-semibold text-ledger text-lg mb-1">Manager reviews</h3>
+                <p className="text-gray-500 max-w-md">Managers see pending expenses immediately. One click to approve or reject, with the full detail in view.</p>
+              </div>
+            </div>
+            <div className="w-full h-px bg-gray-100" />
+            <div className="flex gap-8 items-start">
+              <span className="font-display text-5xl font-semibold text-gray-100 leading-none select-none">03</span>
+              <div>
+                <h3 className="font-semibold text-ledger text-lg mb-1">Admin pays</h3>
+                <p className="text-gray-500 max-w-md">Approved expenses queue in the payments dashboard. Secure Stripe checkout handles the transfer — no manual bank transfers.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Roles */}
+      <section className="px-8 py-20 max-w-5xl mx-auto">
+        <h2 className="font-display text-3xl font-semibold text-ledger mb-10">Built for every role</h2>
+        <div className="grid md:grid-cols-3 gap-0 border border-gray-100 rounded overflow-hidden">
+          <div className="p-6 border-r border-gray-100">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Employee</p>
+            <h3 className="font-display text-lg font-semibold text-ledger mb-2">Submit and track</h3>
+            <p className="text-sm text-gray-500 leading-relaxed">Add expenses with supporting receipts. Track status from pending to paid without chasing anyone.</p>
+          </div>
+          <div className="p-6 border-r border-gray-100 bg-cream">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Manager</p>
+            <h3 className="font-display text-lg font-semibold text-ledger mb-2">Review and decide</h3>
+            <p className="text-sm text-gray-500 leading-relaxed">See your team's expenses in real time. Approve or reject with context — category, description, receipt — all in one row.</p>
+          </div>
+          <div className="p-6">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Admin</p>
+            <h3 className="font-display text-lg font-semibold text-ledger mb-2">Manage and pay</h3>
+            <p className="text-sm text-gray-500 leading-relaxed">Full oversight of users, teams, and approved expenses. Process payments securely and view the complete paid history.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="px-8 py-20 bg-ledger text-center">
+        <h2 className="font-display text-3xl font-semibold text-white mb-4">
+          Ready to bring order to your team expenses?
+        </h2>
+        <p className="text-white/60 mb-8 max-w-md mx-auto">
+          Get your organization set up in minutes. No spreadsheets required.
+        </p>
         <button
-          onClick={() => navigate("/login")}
-          className="mt-8 bg-gradient-to-r from-emerald-400 to-green-500 hover:from-emerald-500 hover:to-green-600 px-8 py-3 rounded-lg text-lg font-semibold shadow-lg hover:scale-105 transition"
+          onClick={() => navigate("/signup")}
+          className="bg-cleared text-white px-8 py-3 rounded font-medium hover:bg-cleared-light transition-colors"
         >
-          Get Started
+          Create your account
         </button>
       </section>
 
-      {/* 💡 Problem → Solution */}
-      <section className="px-10 max-w-5xl mx-auto text-center">
-        <h2 className="text-3xl font-bold mb-6">Why TEMS?</h2>
-
-        <p className="text-gray-300 text-lg leading-relaxed">
-          Managing team expenses manually leads to delays, confusion, and lack
-          of transparency. TEMS eliminates these problems by providing a
-          centralized platform where employees submit expenses, managers approve
-          them, and payments are processed seamlessly — all in one place.
-        </p>
-      </section>
-
-      {/* 📊 Stats */}
-      <section className="flex justify-center gap-12 mt-20 text-center">
-        <div>
-          <h2 className="text-3xl font-bold text-emerald-400">100+</h2>
-          <p className="text-gray-400">Expenses Managed</p>
+      {/* Footer */}
+      <footer className="px-8 py-6 bg-ledger-dark border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-3">
+        <span className="font-display text-sm text-white/40">TEMS — Team Expense Management</span>
+        <div className="flex gap-6 text-xs text-white/30">
+          <a href="#" className="hover:text-white/60 transition-colors">Terms of Service</a>
+          <a href="#" className="hover:text-white/60 transition-colors">Privacy Policy</a>
         </div>
-        <div>
-          <h2 className="text-3xl font-bold text-emerald-400">50+</h2>
-          <p className="text-gray-400">Active Users</p>
-        </div>
-        <div>
-          <h2 className="text-3xl font-bold text-emerald-400">99%</h2>
-          <p className="text-gray-400">Accuracy</p>
-        </div>
-      </section>
-
-      {/* 🔥 Features */}
-      <section className="grid md:grid-cols-3 gap-8 px-10 mt-20">
-        <div className="bg-white/5 p-6 rounded-xl border border-white/10 hover:scale-105 transition">
-          <h3 className="text-lg font-semibold mb-2 text-emerald-400">
-            Smart Expense Tracking
-          </h3>
-          <p className="text-gray-300">
-            Capture every expense with categories, timestamps, and tracking —
-            ensuring complete financial clarity across your team.
-          </p>
-        </div>
-
-        <div className="bg-white/5 p-6 rounded-xl border border-white/10 hover:scale-105 transition">
-          <h3 className="text-lg font-semibold mb-2 text-emerald-400">
-            Approval Workflow
-          </h3>
-          <p className="text-gray-300">
-            Managers can review, approve, or reject expenses instantly without
-            delays or manual communication.
-          </p>
-        </div>
-
-        <div className="bg-white/5 p-6 rounded-xl border border-white/10 hover:scale-105 transition">
-          <h3 className="text-lg font-semibold mb-2 text-emerald-400">
-            Secure Payments
-          </h3>
-          <p className="text-gray-300">
-            Approved expenses are processed securely with integrated payment
-            systems like Stripe.
-          </p>
-        </div>
-      </section>
-
-      {/* 🖥️ Dashboard Preview */}
-      <section className="mt-24 px-10 text-center">
-        <h2 className="text-3xl font-bold mb-10">
-          Everything in One Dashboard
-        </h2>
-
-        <div className="bg-white/5 border border-white/10 rounded-xl p-10 max-w-4xl mx-auto">
-          <p className="text-gray-400">
-            Visualize expenses, track approvals, and manage payments — all from
-            a single interface.
-          </p>
-
-          <div className="mt-6 bg-gradient-to-r from-gray-700 to-gray-800 rounded-lg flex items-center justify-center p-4">
-            <img
-              alt="dashboard-img"
-              src={dashboardImg}
-              className="max-w-full h-auto rounded-lg"
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* 🧠 How it works */}
-      <section className="mt-24 px-10 text-center">
-        <h2 className="text-3xl font-bold mb-10">How It Works</h2>
-
-        <div className="grid md:grid-cols-3 gap-10">
-          <div>
-            <h3 className="text-emerald-400 font-semibold mb-2">1. Submit</h3>
-            <p className="text-gray-300">
-              Employees submit expense details with required information.
-            </p>
-          </div>
-
-          <div>
-            <h3 className="text-emerald-400 font-semibold mb-2">2. Approve</h3>
-            <p className="text-gray-300">
-              Managers review and approve or reject instantly.
-            </p>
-          </div>
-
-          <div>
-            <h3 className="text-emerald-400 font-semibold mb-2">3. Pay</h3>
-            <p className="text-gray-300">
-              Approved expenses are paid securely through the system.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* 👥 Roles */}
-      <section className="mt-24 px-10">
-        <h2 className="text-3xl font-bold text-center mb-10">
-          Built for Every Role
-        </h2>
-
-        <div className="grid md:grid-cols-3 gap-8">
-          <div className="bg-white/5 p-6 rounded-xl">
-            <h3 className="font-semibold mb-2">Admin</h3>
-            <p className="text-gray-300">
-              Full control over teams, payments, and expense tracking.
-            </p>
-          </div>
-
-          <div className="bg-white/5 p-6 rounded-xl">
-            <h3 className="font-semibold mb-2">Manager</h3>
-            <p className="text-gray-300">
-              Approve or reject expenses and monitor team activity.
-            </p>
-          </div>
-
-          <div className="bg-white/5 p-6 rounded-xl">
-            <h3 className="font-semibold mb-2">Employee</h3>
-            <p className="text-gray-300">
-              Submit expenses and track reimbursement status easily.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* 🔒 Trust */}
-      <section className="mt-24 px-10 text-center">
-        <h2 className="text-3xl font-bold mb-6">
-          Built for Transparency & Trust
-        </h2>
-
-        <p className="text-gray-400 max-w-3xl mx-auto">
-          Every expense is tracked, every approval is recorded, and every
-          payment is secure — ensuring complete accountability across your
-          organization.
-        </p>
-      </section>
-
-      {/* 🚀 CTA */}
-      <section className="text-center mt-24 pb-20">
-        <h2 className="text-3xl font-bold mb-4">
-          Ready to simplify your team expenses?
-        </h2>
-
-        <button
-          onClick={() => navigate("/login")}
-          className="bg-gradient-to-r from-emerald-400 to-green-500 hover:from-emerald-500 hover:to-green-600 px-8 py-3 rounded-lg text-lg font-semibold shadow-lg"
-        >
-          Start Now
-        </button>
-      </section>
+      </footer>
     </div>
   );
 };

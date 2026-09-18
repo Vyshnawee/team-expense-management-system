@@ -1,20 +1,20 @@
 import { useEffect, useState } from "react";
-import { Users } from "lucide-react";
 import { API_URL } from "../config";
 
 const TeamMembers = () => {
   const [members, setMembers] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const fetchMembers = async () => {
     try {
       const teamId = localStorage.getItem("teamId");
-
       const res = await fetch(`${API_URL}/teams/${teamId}/users`);
       const data = await res.json();
-
-      setMembers(data);
+      setMembers(data || []);
+      setLoading(false);
     } catch (err) {
       console.error(err);
+      setLoading(false);
     }
   };
 
@@ -22,64 +22,57 @@ const TeamMembers = () => {
     fetchMembers();
   }, []);
 
+  if (loading) return <div className="p-8 text-sm text-gray-500">Loading...</div>;
+
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
-      {" "}
-      {/* ✅ centered + controlled width */}
-      {/* Header */}
-      <div className="flex items-center gap-3">
-        <Users className="text-blue-600" size={26} />
-        <h1 className="text-2xl font-semibold text-gray-800">Team Members</h1>
+    <div className="p-8 max-w-4xl font-sans">
+      <div className="mb-6">
+        <h1 className="page-title">Team Members</h1>
+        <p className="page-subtitle">Roster of employees and managers in your department</p>
       </div>
-      {/* Card */}
-      <div className="bg-white shadow-md rounded-xl px-6 py-5 border border-gray-100">
-        <table className="w-full text-sm">
-          {/* Header */}
-          <thead>
-            <tr className="border-b text-gray-500 uppercase text-xs tracking-wide">
-              <th className="py-3 text-left">Name</th>
-              <th className="text-left">Email</th>
-              <th className="text-left">Role</th>
-            </tr>
-          </thead>
 
-          {/* Body */}
-          <tbody>
-            {members.length === 0 ? (
+      <div className="panel overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="data-table">
+            <thead>
               <tr>
-                <td colSpan="3" className="text-center py-6 text-gray-400">
-                  No team members 🚫
-                </td>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
               </tr>
-            ) : (
-              members.map((m) => (
-                <tr
-                  key={m.userId}
-                  className="border-b hover:bg-gray-50 transition"
-                >
-                  <td className="py-3 font-medium text-gray-800">
-                    {m.userName}
-                  </td>
-
-                  <td className="text-gray-600">{m.email}</td>
-
-                  <td>
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-medium 
-                    ${
-                      m.role?.roleName === "MANAGER"
-                        ? "bg-purple-100 text-purple-700"
-                        : "bg-blue-100 text-blue-700"
-                    }`}
-                    >
-                      {m.role?.roleName}
-                    </span>
+            </thead>
+            <tbody>
+              {members.length === 0 ? (
+                <tr>
+                  <td colSpan="3" className="py-12 text-center text-sm text-gray-400">
+                    No team members found
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : (
+                members.map((m) => {
+                  const roleName = m.role?.roleName || m.role || "EMPLOYEE";
+                  const isManager = roleName.toUpperCase().includes("MANAGER");
+
+                  return (
+                    <tr key={m.userId}>
+                      <td className="font-medium text-ledger">{m.userName}</td>
+                      <td>{m.email}</td>
+                      <td>
+                        <span
+                          className={`pill ${
+                            isManager ? "bg-ledger text-white" : "pill-default"
+                          }`}
+                        >
+                          {roleName.replace("ROLE_", "")}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

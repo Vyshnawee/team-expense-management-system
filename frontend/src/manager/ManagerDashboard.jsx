@@ -11,16 +11,14 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { API_URL } from "../config";
-
-import { IndianRupee, CheckCircle, Clock, XCircle } from "lucide-react";
 import NotificationBell from "../Commons/NotificationBell";
 
 const COLORS = [
-  "#22c55e",
-  "#f59e0b",
-  "#3b82f6",
-  "#ef4444",
-  "#a855f7",
+  "#2A7D4F",
+  "#C27B2B",
+  "#1A2332",
+  "#6B7280",
+  "#3A9D63",
   "#06b6d4",
   "#ec4899",
   "#84cc16",
@@ -72,6 +70,7 @@ const ManagerDashboard = () => {
       setLoading(false);
     } catch (err) {
       console.error(err);
+      setLoading(false);
     }
   };
 
@@ -89,96 +88,89 @@ const ManagerDashboard = () => {
     fetchData();
   };
 
-  if (loading) return <h2 className="p-6">Loading...</h2>;
+  if (loading) return <div className="p-8 text-sm text-gray-500">Loading...</div>;
 
   return (
-    <div className="p-6 min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 space-y-6">
-      {/* 🔥 HEADER */}
-      <div className="flex justify-between items-center">
+    <div className="p-8 font-sans">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold">Manager Dashboard</h1>
-          <p className="text-gray-500 text-sm">
-            Manage team expenses and approvals
-          </p>
+          <h1 className="page-title">Team Dashboard</h1>
+          <p className="page-subtitle">Overview of team spending and pending reviews</p>
         </div>
-
         <NotificationBell />
       </div>
 
-      {/* 🔥 SUMMARY CARDS */}
-      <div className="grid md:grid-cols-4 gap-6">
-        <Card
-          title="Total Expenses"
-          value={summary.total}
-          icon={<IndianRupee />}
-        />
-        <Card
-          title="Approved"
-          value={summary.approved}
-          icon={<CheckCircle />}
-          color="text-green-600"
-        />
-        <Card
-          title="Pending"
-          value={summary.pending}
-          icon={<Clock />}
-          color="text-yellow-500"
-        />
-        <Card
-          title="Rejected"
-          value={summary.rejected}
-          icon={<XCircle />}
-          color="text-red-500"
-        />
+      {/* Summary Cards */}
+      <div className="grid md:grid-cols-4 gap-4 mb-6">
+        <div className="panel p-5">
+          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Expenses</p>
+          <p className="font-display text-2xl font-semibold text-ledger mt-2">
+            ₹{Number(summary.total || 0).toLocaleString("en-IN")}
+          </p>
+        </div>
+
+        <div className="panel p-5 border-t-2 border-cleared">
+          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Approved</p>
+          <p className="font-display text-2xl font-semibold text-cleared mt-2">
+            ₹{Number(summary.approved || 0).toLocaleString("en-IN")}
+          </p>
+        </div>
+
+        <div className="panel p-5 border-t-2 border-amber">
+          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Pending</p>
+          <p className="font-display text-2xl font-semibold text-amber mt-2">
+            ₹{Number(summary.pending || 0).toLocaleString("en-IN")}
+          </p>
+        </div>
+
+        <div className="panel p-5 border-t-2 border-red-400">
+          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Rejected</p>
+          <p className="font-display text-2xl font-semibold text-red-600 mt-2">
+            ₹{Number(summary.rejected || 0).toLocaleString("en-IN")}
+          </p>
+        </div>
       </div>
 
-      {/* 🔥 CHARTS */}
-      <div className="grid md:grid-cols-2 gap-6">
-        {/* Monthly */}
-        <div className="bg-white p-6 rounded-2xl shadow-md hover:shadow-lg transition">
-          <h2 className="text-lg font-semibold mb-4 text-gray-700">
-            Monthly Expenses
-          </h2>
-
-          <ResponsiveContainer width="100%" height={300}>
+      {/* Charts Row */}
+      <div className="grid md:grid-cols-2 gap-6 mb-6">
+        <div className="panel p-5">
+          <h2 className="font-display text-base font-semibold text-ledger mb-4">Monthly Expenses</h2>
+          <ResponsiveContainer width="100%" height={260}>
             <LineChart data={monthly}>
               <XAxis
                 dataKey="month"
                 tickFormatter={(m) => months[m - 1]}
-                stroke="#6b7280"
-                axisLine={true}
-                tickLine={true}
+                stroke="#6B7280"
+                fontSize={12}
+                tickLine={false}
               />
-              <YAxis />
-              <Tooltip />
+              <YAxis stroke="#6B7280" fontSize={12} tickLine={false} />
+              <Tooltip formatter={(val) => `₹${val}`} />
               <Line
                 type="monotone"
                 dataKey="amount"
-                stroke="#22c55e"
-                strokeWidth={3}
-                strokeDasharray="5 5"
+                stroke="#2A7D4F"
+                strokeWidth={2}
+                dot={{ r: 3, fill: "#2A7D4F" }}
               />
             </LineChart>
           </ResponsiveContainer>
         </div>
 
-        {/* Category */}
-        <div className="bg-white p-6 rounded-2xl shadow-md hover:shadow-lg transition">
-          <h2 className="text-lg font-semibold mb-4 text-gray-700">
-            Category Breakdown
-          </h2>
-
-          <ResponsiveContainer width="100%" height={300}>
+        <div className="panel p-5">
+          <h2 className="font-display text-base font-semibold text-ledger mb-4">Category Breakdown</h2>
+          <ResponsiveContainer width="100%" height={260}>
             <PieChart>
               <Pie
                 data={category}
                 dataKey="value"
                 nameKey="name"
                 innerRadius={50}
-                outerRadius={110}
-                label={({ name, value }) => `${name} : ₹${value}`}
+                outerRadius={90}
+                label={({ name, value }) => `${name}: ₹${value}`}
               >
-                {category.map((entry, index) => (
+                {category.map((_, index) => (
                   <Cell key={index} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
@@ -188,79 +180,63 @@ const ManagerDashboard = () => {
         </div>
       </div>
 
-      {/* 🔥 PENDING APPROVALS */}
-      <div className="bg-white p-6 rounded-2xl shadow-md hover:shadow-lg transition">
-        <h2 className="text-lg font-semibold mb-4 text-gray-700">
-          Pending Approvals
-        </h2>
-
-        <table className="w-full">
-          <thead>
-            <tr className="text-gray-500 text-sm border-b">
-              <th className="text-left py-2">Name</th>
-              <th className="text-left">Title</th>
-              <th className="text-left">Amount</th>
-              <th className="text-left">Category</th>
-              <th className="text-left">Actions</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {pending.length === 0 ? (
+      {/* Pending Approvals */}
+      <div className="panel overflow-hidden">
+        <div className="px-5 py-4 border-b border-gray-100">
+          <h2 className="font-display text-base font-semibold text-ledger">Pending Approvals</h2>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="data-table">
+            <thead>
               <tr>
-                <td colSpan="5" className="text-center py-6 text-gray-400">
-                  No pending approvals 🎉
-                </td>
+                <th>Employee</th>
+                <th>Title</th>
+                <th>Amount</th>
+                <th>Category</th>
+                <th>Actions</th>
               </tr>
-            ) : (
-              pending.map((item) => (
-                <tr
-                  key={item.expenseId}
-                  className="border-b hover:bg-gray-50 transition"
-                >
-                  <td className="py-3 font-medium">{item.user?.userName}</td>
-                  <td>{item.title}</td>
-                  <td className="text-green-600 font-semibold">
-                    ₹{item.amount}
-                  </td>
-                  <td>
-                    <span className="bg-gray-200 px-2 py-1 rounded text-sm">
-                      {item.category?.name}
-                    </span>
-                  </td>
-                  <td className="space-x-2">
-                    <button
-                      onClick={() => handleApprove(item.expenseId)}
-                      className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-lg text-sm transition active:scale-95"
-                    >
-                      Approve
-                    </button>
-
-                    <button
-                      onClick={() => handleReject(item.expenseId)}
-                      className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg text-sm transition active:scale-95"
-                    >
-                      Reject
-                    </button>
+            </thead>
+            <tbody>
+              {pending.length === 0 ? (
+                <tr>
+                  <td colSpan="5" className="py-8 text-center text-sm text-gray-400">
+                    No pending approvals for your team
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : (
+                pending.map((item) => (
+                  <tr key={item.expenseId}>
+                    <td className="font-medium text-ledger">{item.user?.userName || "—"}</td>
+                    <td>{item.title}</td>
+                    <td className="font-semibold text-ledger">₹{item.amount}</td>
+                    <td>
+                      <span className="pill-default">{item.category?.name || "Uncategorized"}</span>
+                    </td>
+                    <td>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => handleApprove(item.expenseId)}
+                          className="btn-primary text-xs px-3 py-1"
+                        >
+                          Approve
+                        </button>
+                        <button
+                          onClick={() => handleReject(item.expenseId)}
+                          className="border border-red-200 text-red-600 hover:bg-red-50 text-xs px-3 py-1 rounded transition-colors"
+                        >
+                          Reject
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
 };
-
-const Card = ({ title, value, icon, color }) => (
-  <div className="bg-white p-5 rounded-2xl shadow-md hover:shadow-lg transition flex items-center justify-between">
-    <div>
-      <p className="text-gray-500 text-sm">{title}</p>
-      <h2 className="text-2xl font-bold text-gray-800">₹{value || 0}</h2>
-    </div>
-    <div className={`${color} text-3xl`}>{icon}</div>
-  </div>
-);
 
 export default ManagerDashboard;

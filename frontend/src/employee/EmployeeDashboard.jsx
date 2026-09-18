@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { IndianRupee, Receipt, CreditCard, TrendingUp } from "lucide-react";
+import { Link } from "react-router-dom";
 import NotificationBell from "../Commons/NotificationBell";
 import { API_URL } from "../config";
 
@@ -24,28 +24,22 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
 
   const COLORS = [
-    "#3b82f6",
-    "#22c55e",
-    "#f59e0b",
-    "#ef4444",
-    "#8b5cf6",
-    "#14b8a6",
-    "#f97316",
+    "#2A7D4F",
+    "#C27B2B",
+    "#1A2332",
+    "#6B7280",
+    "#3A9D63",
+    "#A0855A",
+    "#4B5563",
   ];
 
-  const getStatusStyle = (status) => {
-    switch (status?.toLowerCase()) {
-      case "approved":
-        return "bg-green-100 text-green-700";
-      case "rejected":
-        return "bg-red-100 text-red-700";
-      case "pending":
-        return "bg-yellow-100 text-yellow-700";
-      case "paid":
-        return "bg-blue-100 text-blue-700";
-      default:
-        return "bg-gray-100 text-gray-700";
-    }
+  const getStatusPill = (status) => {
+    const s = status?.toLowerCase();
+    if (s === "approved") return "pill-approved";
+    if (s === "paid") return "pill-paid";
+    if (s === "pending") return "pill-pending";
+    if (s === "rejected") return "pill-rejected";
+    return "pill-default";
   };
 
   useEffect(() => {
@@ -74,15 +68,10 @@ const Dashboard = () => {
 
     const fetchDashboard = async () => {
       const res = await fetch(`${API_URL}/employee/dashboard/${userId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
-
       if (!res.ok) return;
-
       const data = await res.json();
-
       setStats({
         totalAmount: data.totalAmount,
         paidAmount: data.paidAmount,
@@ -94,44 +83,29 @@ const Dashboard = () => {
     const fetchMonthlyData = async () => {
       const res = await fetch(
         `${API_URL}/employee/dashboard/${userId}/monthly`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-
       if (!res.ok) return;
-
       const data = await res.json();
-
       const fullYear = Array.from({ length: 12 }, (_, i) => ({
         month: monthNames[i],
         amount: 0,
       }));
-
       data.forEach((item) => {
         const index = item.month - 1;
         if (index >= 0 && index < 12) {
           fullYear[index].amount = item.amount;
         }
       });
-
       setMonthlyData(fullYear);
     };
 
     const fetchCategoryData = async () => {
       const res = await fetch(
         `${API_URL}/employee/dashboard/${userId}/category`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-
       if (!res.ok) return;
-
       const data = await res.json();
       setCategoryData(data || []);
     };
@@ -139,15 +113,9 @@ const Dashboard = () => {
     const fetchRecentExpenses = async () => {
       const res = await fetch(
         `${API_URL}/employee/dashboard/${userId}/recent`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-
       if (!res.ok) return;
-
       const data = await res.json();
       setExpenses(data || []);
     };
@@ -165,84 +133,83 @@ const Dashboard = () => {
     loadAll();
   }, []);
 
-  if (loading) return <h2 className="p-6">Loading...</h2>;
+  if (loading) return <div className="p-8 text-sm text-gray-500">Loading...</div>;
 
   return (
-    <div className="w-full p-6 min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      {/* 🔥 HEADER */}
+    <div className="p-8">
+      {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold">Dashboard</h1>
-          <p className="text-gray-500 text-sm">
-            Welcome back 👋 Here’s your expense overview
-          </p>
+          <h1 className="page-title">Dashboard</h1>
+          <p className="page-subtitle">Welcome back — here is your expense overview</p>
         </div>
-
         <NotificationBell />
       </div>
 
-      {/* 🔥 QUICK ACTIONS */}
-      <div className="flex gap-4 mb-6">
-        <button className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm">
+      {/* Quick Actions */}
+      <div className="flex gap-3 mb-6">
+        <Link to="/employee/add-expense" className="btn-primary">
           + Add Expense
-        </button>
-
-        <button className="bg-gray-800 text-white px-4 py-2 rounded-lg text-sm">
-          View Reports
-        </button>
+        </Link>
+        <Link to="/employee/expense" className="btn-secondary">
+          View All Expenses
+        </Link>
       </div>
 
-      {/* 🔥 STATS */}
-      <div className="grid md:grid-cols-4 gap-6 mb-6">
-        <Card
-          title="Total Expenses"
-          value={stats.totalAmount || 0}
-          icon={<IndianRupee />}
-        />
-        <Card
-          title="Paid"
-          value={stats.paidAmount || 0}
-          icon={<CreditCard />}
-          green
-        />
-        <Card
-          title="Pending"
-          value={stats.pendingAmount || 0}
-          icon={<Receipt />}
-          red
-        />
-        <Card
-          title="This Month"
-          value={stats.thisMonth || 0}
-          icon={<TrendingUp />}
-        />
+      {/* Stats Row */}
+      <div className="grid md:grid-cols-4 gap-4 mb-6">
+        <div className="panel p-5">
+          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Expenses</p>
+          <p className="font-display text-2xl font-semibold text-ledger mt-2">
+            ₹{Number(stats.totalAmount || 0).toLocaleString("en-IN")}
+          </p>
+        </div>
+        <div className="panel p-5">
+          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Paid</p>
+          <p className="font-display text-2xl font-semibold text-cleared mt-2">
+            ₹{Number(stats.paidAmount || 0).toLocaleString("en-IN")}
+          </p>
+        </div>
+        <div className="panel p-5 border-t-2 border-amber">
+          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Pending</p>
+          <p className="font-display text-2xl font-semibold text-amber mt-2">
+            ₹{Number(stats.pendingAmount || 0).toLocaleString("en-IN")}
+          </p>
+        </div>
+        <div className="panel p-5">
+          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">This Month</p>
+          <p className="font-display text-2xl font-semibold text-ledger mt-2">
+            ₹{Number(stats.thisMonth || 0).toLocaleString("en-IN")}
+          </p>
+        </div>
       </div>
 
-      {/* 🔥 CHARTS */}
+      {/* Charts Row */}
       <div className="grid md:grid-cols-2 gap-6 mb-6">
-        <div className="bg-white p-5 rounded-2xl shadow-md hover:shadow-lg transition">
-          <h2 className="font-semibold mb-4">Monthly Spending</h2>
-          <ResponsiveContainer width="100%" height={250}>
+        <div className="panel p-5">
+          <h2 className="font-display text-base font-semibold text-ledger mb-4">Monthly Spending</h2>
+          <ResponsiveContainer width="100%" height={240}>
             <LineChart data={monthlyData}>
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip />
-              <Line type="monotone" dataKey="amount" />
+              <XAxis dataKey="month" stroke="#6B7280" fontSize={12} tickLine={false} />
+              <YAxis stroke="#6B7280" fontSize={12} tickLine={false} />
+              <Tooltip formatter={(value) => `₹${value}`} />
+              <Line type="monotone" dataKey="amount" stroke="#2A7D4F" strokeWidth={2} dot={{ r: 3, fill: "#2A7D4F" }} />
             </LineChart>
           </ResponsiveContainer>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl shadow-md hover:shadow-lg transition">
-          <h2 className="font-semibold mb-4">Category Breakdown</h2>
-          <ResponsiveContainer width="100%" height={250}>
+        <div className="panel p-5">
+          <h2 className="font-display text-base font-semibold text-ledger mb-4">Category Breakdown</h2>
+          <ResponsiveContainer width="100%" height={240}>
             <PieChart>
               <Pie
                 data={categoryData}
                 dataKey="value"
                 nameKey="name"
+                innerRadius={45}
                 outerRadius={80}
               >
-                {categoryData.map((entry, index) => (
+                {categoryData.map((_, index) => (
                   <Cell key={index} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
@@ -253,65 +220,45 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* 🔥 RECENT EXPENSES */}
-      <div className="bg-white p-6 rounded-2xl shadow-md">
-        <h2 className="font-semibold mb-4">Recent Expenses</h2>
-
-        <table className="w-full">
-          <thead>
-            <tr className="text-gray-500 text-sm">
-              <th className="text-left">Name</th>
-              <th className="text-left">Title</th>
-              <th className="text-left">Amount</th>
-              <th className="text-left">Status</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {expenses.length === 0 ? (
+      {/* Recent Expenses */}
+      <div className="panel overflow-hidden">
+        <div className="px-5 py-4 border-b border-gray-100 flex justify-between items-center">
+          <h2 className="font-display text-base font-semibold text-ledger">Recent Expenses</h2>
+          <Link to="/employee/expense" className="text-xs text-cleared hover:underline font-medium">View all</Link>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="data-table">
+            <thead>
               <tr>
-                <td colSpan="4" className="text-center py-6 text-gray-400">
-                  No expenses found
-                </td>
+                <th>User</th>
+                <th>Title</th>
+                <th>Amount</th>
+                <th>Status</th>
               </tr>
-            ) : (
-              expenses.map((exp) => (
-                <tr
-                  key={exp.id}
-                  className="border-t hover:bg-gray-50 transition"
-                >
-                  <td className="py-3">{exp.userName}</td>
-                  <td>{exp.title}</td>
-                  <td>₹{exp.amount}</td>
-                  <td>
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusStyle(exp.status)}`}
-                    >
-                      {exp.status}
-                    </span>
+            </thead>
+            <tbody>
+              {expenses.length === 0 ? (
+                <tr>
+                  <td colSpan="4" className="py-8 text-center text-sm text-gray-400">
+                    No recent expenses found
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : (
+                expenses.map((exp) => (
+                  <tr key={exp.id || exp.expenseId}>
+                    <td className="font-medium text-ledger">{exp.userName}</td>
+                    <td>{exp.title}</td>
+                    <td className="font-semibold text-ledger">₹{exp.amount}</td>
+                    <td>
+                      <span className={getStatusPill(exp.status)}>{exp.status}</span>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
-  );
-};
-
-const Card = ({ title, value, icon, green, red }) => {
-  return (
-    <div className="bg-white p-5 rounded-2xl shadow-md hover:shadow-lg transition flex items-center justify-between">
-      <div>
-        <p className="text-gray-500">{title}</p>
-        <h3
-          className={`text-xl font-bold ${green ? "text-green-600" : red ? "text-red-500" : ""}`}
-        >
-          ₹{value}
-        </h3>
-      </div>
-      <div className="text-gray-500">{icon}</div>
     </div>
   );
 };
