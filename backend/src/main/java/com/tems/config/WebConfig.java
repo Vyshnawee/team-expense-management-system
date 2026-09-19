@@ -13,15 +13,16 @@ public class WebConfig {
 
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:5173")
-                        .allowedMethods("*");
+                registry.addMapping("/**")  //allow all end points
+                        .allowedOrigins("http://localhost:5173")  //only allow this url from frontend
+                        .allowedMethods("*");  //all http methods are allowed
             }
-
+            
+            // for static files
             @Override
             public void addResourceHandlers(ResourceHandlerRegistry registry) {
-            	registry.addResourceHandler("/uploads/**")
-                .addResourceLocations("file:uploads/");
+                registry.addResourceHandler("/uploads/**")
+                        .addResourceLocations("file:C:/Users/Admin/git/repository/tems/backend/uploads/");
             }
         };
     }
