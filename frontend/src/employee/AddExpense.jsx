@@ -17,15 +17,13 @@ const AddExpense = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
 
-  // ✅ Fetch categories
   useEffect(() => {
     fetch(`${API_URL}/categories`)
       .then((res) => res.json())
-      .then((data) => setCategories(data))
+      .then((data) => setCategories(data || []))
       .catch((err) => console.error(err));
   }, []);
 
-  // ✅ Prefill for edit
   useEffect(() => {
     if (editData) {
       setTitle(editData.title || "");
@@ -35,10 +33,8 @@ const AddExpense = () => {
     }
   }, [editData]);
 
-  // ✅ Submit
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const userId = localStorage.getItem("userId");
 
     if (!userId) {
@@ -75,9 +71,7 @@ const AddExpense = () => {
 
       const res = await fetch(url, {
         method,
-        headers: {
-          userId: userId,
-        },
+        headers: { userId: userId },
         body: formData,
       });
 
@@ -86,11 +80,9 @@ const AddExpense = () => {
       if (res.ok) {
         setSuccess(
           editData
-            ? "✅ Expense updated successfully!"
-            : "✅ Expense added successfully!",
+            ? "Expense updated successfully."
+            : "Expense added successfully."
         );
-
-        // Reset
         setTitle("");
         setAmount("");
         setDescription("");
@@ -99,67 +91,73 @@ const AddExpense = () => {
 
         setTimeout(() => {
           navigate("/employee/expense");
-        }, 1500);
+        }, 1200);
       } else {
-        alert("❌ Failed: " + text);
+        alert("Failed: " + text);
       }
     } catch (err) {
       console.error(err);
-      alert("❌ Something went wrong");
+      alert("Something went wrong");
     }
 
     setLoading(false);
   };
 
   return (
-    <div className="w-full min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center p-6">
-      <div className="bg-white shadow-xl rounded-2xl w-full max-w-lg p-8">
-        <h1 className="text-2xl font-bold text-gray-800 mb-6">
-          {editData ? "✏️ Edit Expense" : "➕ Add Expense"}
-        </h1>
+    <div className="max-w-lg mx-auto py-8 px-6 font-sans">
+      <div className="mb-6">
+        <h1 className="page-title">{editData ? "Edit Expense" : "Add Expense"}</h1>
+        <p className="page-subtitle">Enter the details of your business expense</p>
+      </div>
 
-        {success && (
-          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-            {success}
-          </div>
-        )}
+      {success && (
+        <div className="bg-cleared-50 border border-cleared-100 text-cleared px-4 py-3 rounded text-sm mb-4">
+          {success}
+        </div>
+      )}
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Title */}
+      <div className="panel p-6">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="text-sm text-gray-600">Title</label>
+            <label className="block text-xs font-medium text-gray-600 mb-1.5 uppercase tracking-wide">
+              Expense Title
+            </label>
             <input
               type="text"
-              className="w-full border rounded-lg px-3 py-2 mt-1"
+              className="field-input"
+              placeholder="e.g., Client Dinner, Office Supplies"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
             />
           </div>
 
-          {/* Amount */}
           <div>
-            <label className="text-sm text-gray-600">Amount</label>
+            <label className="block text-xs font-medium text-gray-600 mb-1.5 uppercase tracking-wide">
+              Amount (₹)
+            </label>
             <input
               type="number"
-              className="w-full border rounded-lg px-3 py-2 mt-1"
+              className="field-input"
+              placeholder="0.00"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               required
             />
           </div>
 
-          {/* Category */}
           <div>
-            <label className="text-sm text-gray-600">Category</label>
+            <label className="block text-xs font-medium text-gray-600 mb-1.5 uppercase tracking-wide">
+              Category
+            </label>
             <select
-              className="w-full border rounded-lg px-3 py-2 mt-1"
+              className="field-input"
               value={categoryId}
               onChange={(e) => setCategoryId(e.target.value)}
               required
             >
               <option value="" disabled>
-                Select Category
+                Select category
               </option>
               {categories.map((cat) => (
                 <option key={cat.categoryId} value={cat.categoryId}>
@@ -169,31 +167,51 @@ const AddExpense = () => {
             </select>
           </div>
 
-          {/* Description */}
-          <textarea
-            className="w-full border rounded-lg px-3 py-2"
-            placeholder="Description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1.5 uppercase tracking-wide">
+              Description
+            </label>
+            <textarea
+              className="field-input min-h-[90px]"
+              placeholder="Additional details regarding this expense"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+          </div>
 
-          {/* File */}
-          <input type="file" onChange={(e) => setFile(e.target.files[0])} />
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1.5 uppercase tracking-wide">
+              Receipt / Attachment (Optional, max 5MB)
+            </label>
+            <input
+              type="file"
+              onChange={(e) => setFile(e.target.files[0])}
+              className="block w-full text-xs text-gray-500 file:mr-3 file:py-2 file:px-3 file:rounded file:border-0 file:text-xs file:font-medium file:bg-gray-100 file:text-ledger hover:file:bg-gray-200 cursor-pointer"
+            />
+          </div>
 
-          {/* Button */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
-          >
-            {loading
-              ? editData
-                ? "Updating..."
-                : "Adding..."
-              : editData
+          <div className="pt-2 flex gap-3">
+            <button
+              type="button"
+              onClick={() => navigate("/employee/expense")}
+              className="btn-secondary flex-1"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn-primary flex-1 py-2.5"
+            >
+              {loading
+                ? editData
+                  ? "Updating..."
+                  : "Adding..."
+                : editData
                 ? "Update Expense"
-                : "Add Expense"}
-          </button>
+                : "Submit Expense"}
+            </button>
+          </div>
         </form>
       </div>
     </div>

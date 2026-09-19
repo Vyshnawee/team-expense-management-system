@@ -1,16 +1,46 @@
-import { useNavigate, useLocation, Outlet } from "react-router-dom";
-import {
-  Users,
-  Receipt,
-  CheckCircle,
-  LayoutDashboard,
-  LogOut,
-  UserCircle,
-} from "lucide-react";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
+
+const DashIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/>
+    <rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/>
+  </svg>
+);
+
+const UsersIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <circle cx="6" cy="5" r="2.5"/><path d="M1 14c0-2.761 2.239-5 5-5s5 2.239 5 5"/>
+    <circle cx="11.5" cy="5" r="2" opacity="0.6"/><path d="M11 14c0-2.5 1.5-4.5 3-4.5" opacity="0.6"/>
+  </svg>
+);
+
+const ReceiptIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <path d="M3 1h10v14l-2-1.5L9 15l-2-1.5L5 15l-2-1.5V1z"/>
+    <line x1="5" y1="5" x2="11" y2="5"/><line x1="5" y1="8" x2="9" y2="8"/>
+  </svg>
+);
+
+const ApprovalIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <circle cx="8" cy="8" r="6.5"/><polyline points="5,8 7,10.5 11,5.5"/>
+  </svg>
+);
+
+const UserIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <circle cx="8" cy="5" r="3"/><path d="M2 14c0-3.314 2.686-6 6-6s6 2.686 6 6"/>
+  </svg>
+);
+
+const SignOutIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+    <path d="M6 2H3a1 1 0 00-1 1v10a1 1 0 001 1h3"/><polyline points="10,5 13,8 10,11"/><line x1="13" y1="8" x2="5" y2="8"/>
+  </svg>
+);
 
 const ManagerSidebar = () => {
   const navigate = useNavigate();
-  const location = useLocation();
 
   const handleLogout = () => {
     localStorage.clear();
@@ -18,96 +48,97 @@ const ManagerSidebar = () => {
   };
 
   return (
-    <div className="flex h-screen">
-      {/* Sidebar */}
-      <div className="w-64 bg-gray-900 text-white p-5 flex flex-col justify-between">
-        <div>
-          <h1 className="text-2xl font-bold mb-8">Manager Panel</h1>
-
-          <ul className="space-y-4">
-            {/* Dashboard */}
-            <li
-              onClick={() => navigate("/manager/dashboard")}
-              className={`flex items-center gap-3 cursor-pointer p-2 rounded 
-              ${
-                location.pathname === "/manager/dashboard"
-                  ? "bg-gray-700"
-                  : "hover:bg-gray-800"
-              }`}
-            >
-              <LayoutDashboard size={18} />
-              Dashboard
-            </li>
-
-            {/* Team Members */}
-            <li
-              onClick={() => navigate("/manager/team-members")}
-              className={`flex items-center gap-3 cursor-pointer p-2 rounded 
-              ${
-                location.pathname === "/manager/team-members"
-                  ? "bg-gray-700"
-                  : "hover:bg-gray-800"
-              }`}
-            >
-              <Users size={18} />
-              Team Members
-            </li>
-
-            {/* Team Expenses */}
-            <li
-              onClick={() => navigate("/manager/team-expenses")}
-              className={`flex items-center gap-3 cursor-pointer p-2 rounded 
-              ${
-                location.pathname === "/manager/team-expenses"
-                  ? "bg-gray-700"
-                  : "hover:bg-gray-800"
-              }`}
-            >
-              <Receipt size={18} />
-              Team Expenses
-            </li>
-
-            {/* Approvals */}
-            <li
-              onClick={() => navigate("/manager/approvals")}
-              className={`flex items-center gap-3 cursor-pointer p-2 rounded 
-              ${
-                location.pathname === "/manager/approvals"
-                  ? "bg-gray-700"
-                  : "hover:bg-gray-800"
-              }`}
-            >
-              <CheckCircle size={18} />
-              Approvals
-            </li>
-
-            <li
-              onClick={() => navigate("/manager/profile")}
-              className={`flex items-center gap-3 cursor-pointer p-2 rounded 
-              ${
-                location.pathname === "/manager/profile"
-                  ? "bg-gray-700"
-                  : "hover:bg-gray-800"
-              }`}
-            >
-              <UserCircle size={18} />
-              Profile
-            </li>
-          </ul>
+    <div className="flex font-sans">
+      <div className="w-56 h-screen bg-ledger fixed top-0 left-0 flex flex-col z-10">
+        <div className="px-5 pt-6 pb-5 border-b border-white/10">
+          <span className="font-display text-xl text-white font-semibold tracking-tight">TEMS</span>
+          <p className="text-xs text-white/40 mt-0.5">Manager Portal</p>
         </div>
 
-        {/* Logout */}
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-2 bg-red-600 hover:bg-red-700 p-2 rounded"
-        >
-          <LogOut size={18} />
-          Logout
-        </button>
+        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+          <NavLink
+            to="/manager/dashboard"
+            className={({ isActive }) =>
+              `flex items-center gap-2.5 px-3 py-2 rounded text-sm transition-colors ${
+                isActive
+                  ? "bg-white/10 text-white font-medium border-l-2 border-cleared"
+                  : "text-white/60 hover:text-white hover:bg-white/5"
+              }`
+            }
+          >
+            <DashIcon />
+            Dashboard
+          </NavLink>
+
+          <NavLink
+            to="/manager/team-members"
+            className={({ isActive }) =>
+              `flex items-center gap-2.5 px-3 py-2 rounded text-sm transition-colors ${
+                isActive
+                  ? "bg-white/10 text-white font-medium border-l-2 border-cleared"
+                  : "text-white/60 hover:text-white hover:bg-white/5"
+              }`
+            }
+          >
+            <UsersIcon />
+            Team Members
+          </NavLink>
+
+          <NavLink
+            to="/manager/team-expenses"
+            className={({ isActive }) =>
+              `flex items-center gap-2.5 px-3 py-2 rounded text-sm transition-colors ${
+                isActive
+                  ? "bg-white/10 text-white font-medium border-l-2 border-cleared"
+                  : "text-white/60 hover:text-white hover:bg-white/5"
+              }`
+            }
+          >
+            <ReceiptIcon />
+            Team Expenses
+          </NavLink>
+
+          <NavLink
+            to="/manager/approvals"
+            className={({ isActive }) =>
+              `flex items-center gap-2.5 px-3 py-2 rounded text-sm transition-colors ${
+                isActive
+                  ? "bg-white/10 text-white font-medium border-l-2 border-cleared"
+                  : "text-white/60 hover:text-white hover:bg-white/5"
+              }`
+            }
+          >
+            <ApprovalIcon />
+            Approvals
+          </NavLink>
+
+          <NavLink
+            to="/manager/profile"
+            className={({ isActive }) =>
+              `flex items-center gap-2.5 px-3 py-2 rounded text-sm transition-colors ${
+                isActive
+                  ? "bg-white/10 text-white font-medium border-l-2 border-cleared"
+                  : "text-white/60 hover:text-white hover:bg-white/5"
+              }`
+            }
+          >
+            <UserIcon />
+            Profile
+          </NavLink>
+        </nav>
+
+        <div className="px-3 pb-5">
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2.5 w-full px-3 py-2 text-sm text-white/40 hover:text-white/80 transition-colors"
+          >
+            <SignOutIcon />
+            Sign out
+          </button>
+        </div>
       </div>
 
-      {/* Page Content */}
-      <div className="flex-1 bg-gray-100 p-6 overflow-auto">
+      <div className="ml-56 flex-1 min-h-screen bg-cream">
         <Outlet />
       </div>
     </div>

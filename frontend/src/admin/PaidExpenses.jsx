@@ -3,74 +3,76 @@ import { API_URL } from "../config";
 
 const PaidExpenses = () => {
   const [expenses, setExpenses] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch(`${API_URL}/expenses/paid`)
       .then((res) => res.json())
-      .then((data) => setExpenses(data))
-      .catch((err) => console.error(err));
+      .then((data) => {
+        setExpenses(data || []);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        setLoading(false);
+      });
   }, []);
 
-  return (
-    <div className="p-6">
-      {/* 🔥 HEADER */}
-      <div className="mb-6 flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800">💳 Paid Expenses</h1>
-          <p className="text-gray-500 text-sm">
-            Track all completed payments and transactions
-          </p>
-        </div>
+  if (loading) return <div className="p-8 text-sm text-gray-500">Loading...</div>;
 
-        {/* Optional badge */}
-        <div className="bg-green-100 text-green-700 px-4 py-2 rounded-lg text-sm font-medium">
-          Total: {expenses.length}
+  return (
+    <div className="p-8 font-sans">
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h1 className="page-title">Paid Expenses</h1>
+          <p className="page-subtitle">Historical record of completed reimbursements</p>
         </div>
+        <span className="pill-paid">
+          Total Paid: {expenses.length}
+        </span>
       </div>
 
-      {/* TABLE */}
-      <div className="bg-gray-100 p-6 rounded-2xl shadow">
-        {/* HEADER ROW */}
-        <ul className="grid grid-cols-6 text-gray-600 font-semibold text-sm pb-3 border-b">
-          <li>TITLE</li>
-          <li>AMOUNT</li>
-          <li>EMPLOYEE</li>
-          <li>TEAM</li>
-          <li>STATUS</li>
-          <li>PAID DATE</li>
-        </ul>
-
-        {/* ROWS */}
-        {Array.isArray(expenses) && expenses.length > 0 ? (
-          expenses.map((exp) => (
-            <ul
-              key={exp.expenseId}
-              className="grid grid-cols-6 items-center py-4 border-b hover:bg-gray-50"
-            >
-              <li className="font-medium">{exp.title}</li>
-
-              <li className="text-green-600 font-semibold">₹{exp.amount}</li>
-
-              <li>{exp.userName || "N/A"}</li>
-
-              <li>{exp.teamName || "N/A"}</li>
-
-              <li>
-                <span className="px-3 py-1 text-xs rounded-full bg-green-100 text-green-700">
-                  PAID
-                </span>
-              </li>
-
-              <li>
-                {exp.paidAt ? new Date(exp.paidAt).toLocaleString() : "N/A"}
-              </li>
-            </ul>
-          ))
-        ) : (
-          <p className="text-center py-6 text-gray-500">
-            No paid expenses found
-          </p>
-        )}
+      <div className="panel overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Amount</th>
+                <th>Employee</th>
+                <th>Team</th>
+                <th>Status</th>
+                <th>Paid Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Array.isArray(expenses) && expenses.length > 0 ? (
+                expenses.map((exp) => (
+                  <tr key={exp.expenseId}>
+                    <td className="font-medium text-ledger">{exp.title}</td>
+                    <td className="font-semibold text-cleared">₹{exp.amount}</td>
+                    <td>{exp.userName || "—"}</td>
+                    <td>{exp.teamName || "—"}</td>
+                    <td>
+                      <span className="pill-paid">PAID</span>
+                    </td>
+                    <td className="text-gray-500">
+                      {exp.paidAt
+                        ? new Date(exp.paidAt).toLocaleDateString("en-IN")
+                        : "—"}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="6" className="py-12 text-center text-sm text-gray-400">
+                    No paid expenses recorded
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
