@@ -9,6 +9,7 @@ public class TemsApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(TemsApplication.class, args);
+		
 	}
 
 }
